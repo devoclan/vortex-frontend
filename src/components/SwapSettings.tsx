@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useDismissableOverlay } from "@/hooks/useDismissableOverlay";
 import { useTranslation } from "@/lib/i18n/I18nProvider";
 import type { MessageKey } from "@/lib/i18n";
@@ -12,6 +12,7 @@ import {
   type SlippageStatus,
 } from "@/lib/slippage";
 import { useSwapSettingsStore } from "@/store/swapSettings";
+import { useAnnounce } from "@/components/Announcer";
 
 const STATUS_MESSAGE_KEY: Partial<Record<SlippageStatus, MessageKey>> = {
   low: "swap.slippage.lowWarning",
@@ -48,6 +49,7 @@ export function SwapSettings() {
   const close = useCallback(() => setOpen(false), []);
   const panelRef = useDismissableOverlay<HTMLDivElement>({ isOpen: open, onClose: close, triggerRef });
   const baseId = useId();
+  const announce = useAnnounce();
 
   const customValue = parseSlippageInput(customText);
   const status: SlippageStatus =
@@ -55,6 +57,14 @@ export function SwapSettings() {
   const statusKey = STATUS_MESSAGE_KEY[status];
   const messageId = `${baseId}-slippage-msg`;
   const triggerWarn = getSlippageStatus(slippagePct) !== "ok";
+
+  // Route slippage-status changes through the shared Announcer so screen
+  // readers get consistent throttling/coalescing per docs/accessibility.md.
+  // Invalid values are announced assertively; warnings politely.
+  useEffect(() => {
+    if (!statusKey) return;
+    announce(t(statusKey), { politeness: status === "invalid" ? "assertive" : "polite" });
+  }, [statusKey, status, announce, t]);
 
   const handleCustomChange = (raw: string) => {
     setCustomMode(true);

@@ -1,10 +1,11 @@
 "use client";
 
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n/I18nProvider";
 import { useDismissableOverlay } from "@/hooks/useDismissableOverlay";
 import { secureLogger } from "@/lib/secureLogging";
 import { downloadBlob, startExport, type ExportJob } from "@/lib/export/client";
+import { useAnnounce } from "@/components/Announcer";
 import {
   EXPORT_COLUMNS,
   applyFilenameTemplate,
@@ -24,6 +25,7 @@ type Props = {
 
 export function ExportDialog({ items, filenameBase }: Props) {
   const { t } = useTranslation();
+  const announce = useAnnounce();
   const id = useId();
   const [open, setOpen] = useState(false);
   const [format, setFormat] = useState<ExportFormat>("csv");
@@ -43,6 +45,21 @@ export function ExportDialog({ items, filenameBase }: Props) {
 
   const rows = useMemo(() => filterByDateRange(items, from || undefined, to || undefined), [items, from, to]);
   const running = progress !== null;
+
+  // Route progress updates through the shared Announcer (polite) per docs/accessibility.md.
+  useEffect(() => {
+    if (!progress) return;
+    announce(t("export.progress", { done: String(progress.done), total: String(progress.total) }), {
+      politeness: "polite",
+      source: "export-progress",
+    });
+  }, [progress, announce, t]);
+
+  // Route error messages through the shared Announcer (assertive) per docs/accessibility.md.
+  useEffect(() => {
+    if (!error) return;
+    announce(error, { politeness: "assertive", source: "export-error" });
+  }, [error, announce]);
 
   const toggleColumn = (col: ExportColumn) =>
     setColumns((prev) => (prev.includes(col) ? prev.filter((c) => c !== col) : EXPORT_COLUMNS.filter((c) => c === col || prev.includes(c))));
