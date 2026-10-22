@@ -107,7 +107,7 @@ export function ExportDialog({ items, filenameBase }: Props) {
           id={`${id}-panel`}
           role="dialog"
           aria-label={t("export.title")}
-          className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-vx-border bg-vx-card p-4 shadow-xl z-50 space-y-4 text-xs text-vx-muted"
+          className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl border border-vx-border bg-vx-card p-4 shadow-xl space-y-4 text-xs text-vx-muted motion-safe:animate-[sheet-up_180ms_ease-out] sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-0 sm:mt-2 sm:w-80 sm:max-w-[calc(100vw-2rem)] sm:max-h-none sm:overflow-visible sm:rounded-xl sm:animate-none"
         >
           <fieldset>
             <legend className="font-medium mb-1">{t("export.format")}</legend>

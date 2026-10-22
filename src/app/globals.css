@@ -1,440 +1,118 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  * {
-    box-sizing: border-box;
-  }
+@custom-variant dark (&:where(.dark, .dark *));
 
-  /* ── Font stacks ─────────────────────────────────────────────────────────── */
-  :root {
-    --font-geist-sans: "Inter", system-ui, sans-serif;
-    --font-geist-mono: "JetBrains Mono", ui-monospace, monospace;
-  }
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-ring: var(--ring);
+}
 
-  html {
-    -webkit-font-smoothing: antialiased;
-  }
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --muted: #f4f4f5;
+  --muted-foreground: #52525b;
+  --border: #e4e4e7;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --destructive: #dc2626;
+  --destructive-foreground: #fafafa;
+  --ring: #a1a1aa;
+}
 
-  /* ── Dark theme (default) ───────────────────────────────────────────────── */
-  /*
-   * The :root block defines the dark-mode palette.  The light-mode overrides
-   * below flip every variable to its light counterpart.  Because Tailwind
-   * resolves all vx-* color tokens to var(--vx-*), every component in the
-   * tree automatically adapts without any className changes.
-   *
-   * The effective theme is driven by the `data-theme` attribute on <html>,
-   * which is set before paint by the inline blocking script in layout.tsx
-   * (see src/lib/theme.ts).  `data-theme="light"` selects the light palette;
-   * `data-theme="dark"` (or no attribute) selects the dark palette.  The
-   * light palette is defined exactly once below — it is NOT duplicated inside
-   * a prefers-color-scheme media query, so a user override always wins.
-   */
-  :root,
-  html[data-theme="dark"] {
-    color-scheme: dark;
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --border: #27272a;
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --ring: #52525b;
+}
 
-    /* Surfaces */
-    --vx-ink:     #080C14;
-    --vx-base:    #0C1120;
-    --vx-surface: #111827;
-    --vx-card:    #161E2E;
-    --vx-border:  rgba(255, 255, 255, 0.07);
-    --vx-line:    rgba(255, 255, 255, 0.04);
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+}
 
-    /* Primary: sage green */
-    --vx-sage:     #4CEBA8;
-    --vx-sage-dim: #2A8A62;
-    --vx-sage-bg:  rgba(76, 235, 168, 0.08);
+/* ------------------------------------------------------------------ */
+/* Bottom-sheet overlay variant (issue #620)                           */
+/*                                                                     */
+/* On narrow viewports (< sm) transient overlays such as SwapSettings  */
+/* and ExportDialog render as a full-width sheet anchored to the       */
+/* bottom edge instead of an absolutely-positioned popover. At sm and  */
+/* above the sheet classes are inert so the existing anchored popover  */
+/* behaviour is preserved.                                             */
+/* ------------------------------------------------------------------ */
 
-    /* Accent: lavender */
-    --vx-lav:     #A78BFA;
-    --vx-lav-dim: #5B3F8C;
-    --vx-lav-bg:  rgba(167, 139, 250, 0.08);
+.overlay-sheet {
+  /* Desktop / sm+: no-op, the component keeps its anchored popover. */
+}
 
-    /* State */
-    --vx-amber: #F5A623;
-    --vx-rose:  #F87171;
-
-    /* Text */
-    --vx-text:  #E8EDF5;
-    --vx-muted: #6B7A8E;
-    --vx-dim:   #374151;
-
-    /* Body background (used in the body rule below) */
-    --vx-body-bg:      #080C14;
-    --vx-body-radial1: rgba(76, 235, 168, 0.06);
-    --vx-body-radial2: rgba(167, 139, 250, 0.04);
-
-    /* Scrollbar */
-    --vx-scrollbar-thumb: rgba(255, 255, 255, 0.08);
-
-    /* Selection */
-    --vx-selection-bg: rgba(76, 235, 168, 0.25);
-
-    /* Focus ring */
-    --vx-focus-ring: rgba(76, 235, 168, 0.5);
-
-    /* Motion durations — zeroed under reduce (see below) */
-    --vx-motion-duration: 1.2s;
-    --vx-motion-duration-fast: 0.15s;
-  }
-
-  /* ── Light theme ─────────────────────────────────────────────────────────── */
-  /*
-   * All surfaces invert: ink → near-white, card → white, surface → light grey.
-   * Text colour inverts similarly.  The sage/lavender hues stay saturated but
-   * their backgrounds and dims shift so they read well on white.
-   *
-   * Selected only when the user (or the pre-paint script) sets
-   * data-theme="light" on <html>.  Defined once here — never inside a
-   * prefers-color-scheme media query — so an explicit user choice is honoured.
-   */
-  html[data-theme="light"] {
-    color-scheme: light;
-
-    /* Surfaces */
-    --vx-ink:     #FFFFFF;
-    --vx-base:    #F5F7FA;
-    --vx-surface: #EFF1F5;
-    --vx-card:    #FFFFFF;
-    --vx-border:  rgba(0, 0, 0, 0.08);
-    --vx-line:    rgba(0, 0, 0, 0.05);
-
-    /* Primary: sage green (slightly deeper for contrast on white) */
-    --vx-sage:     #0FA871;
-    --vx-sage-dim: #0A6849;
-    --vx-sage-bg:  rgba(15, 168, 113, 0.08);
-
-    /* Accent: lavender */
-    --vx-lav:     #7C3AED;
-    --vx-lav-dim: #4C1D95;
-    --vx-lav-bg:  rgba(124, 58, 237, 0.08);
-
-    /* State */
-    --vx-amber: #D97706;
-    --vx-rose:  #DC2626;
-
-    /* Text */
-    --vx-text:  #0F172A;
-    --vx-muted: #64748B;
-    --vx-dim:   #CBD5E1;
-
-    /* Body background */
-    --vx-body-bg:      #F5F7FA;
-    --vx-body-radial1: rgba(15, 168, 113, 0.04);
-    --vx-body-radial2: rgba(124, 58, 237, 0.03);
-
-    /* Scrollbar */
-    --vx-scrollbar-thumb: rgba(0, 0, 0, 0.12);
-
-    /* Selection */
-    --vx-selection-bg: rgba(15, 168, 113, 0.2);
-
-    /* Focus ring */
-    --vx-focus-ring: rgba(15, 168, 113, 0.5);
-  }
-
-  /* ── Body ────────────────────────────────────────────────────────────────── */
-  body {
-    background-color: var(--vx-body-bg);
-    background-image:
-      radial-gradient(ellipse 80% 60% at 50% -20%, var(--vx-body-radial1) 0%, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 80% 80%, var(--vx-body-radial2) 0%, transparent 60%);
-    background-attachment: fixed;
-    min-height: 100vh;
-    color: var(--vx-text);
-  }
-
-  /* ── Scrollbar ───────────────────────────────────────────────────────────── */
-  ::-webkit-scrollbar { width: 3px; height: 3px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb {
-    background: var(--vx-scrollbar-thumb);
-    border-radius: 2px;
-  }
-
-  /* ── Selection ───────────────────────────────────────────────────────────── */
-  ::selection { background: var(--vx-selection-bg); color: inherit; }
-
-  /* ── Focus ring ──────────────────────────────────────────────────────────── */
-  :focus-visible {
-    outline: 1.5px solid var(--vx-focus-ring);
-    outline-offset: 2px;
-  }
-
-  /* ── RTL / bidi isolation ────────────────────────────────────────────────── */
-  /*
-   * Mixed-direction content (addresses, hashes, amounts, code) must stay LTR
-   * even inside an RTL document.  `unicode-bidi: isolate` prevents the
-   * surrounding RTL context from reordering the embedded run, and
-   * `text-align: start` keeps the block aligned to the logical start edge.
-   */
-  [dir="ltr"],
-  bdi,
-  .bidi-isolate {
-    unicode-bidi: isolate;
-  }
-
-  /*
-   * When the document is RTL, keep numeric/address/code runs LTR and aligned
-   * to the logical start so they read correctly without breaking the layout.
-   */
-  [dir="rtl"] [dir="ltr"],
-  [dir="rtl"] bdi,
-  [dir="rtl"] .bidi-isolate {
-    direction: ltr;
-    text-align: start;
+@media (max-width: 639px) {
+  .overlay-sheet {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    top: auto;
+    right: auto;
+    left: 0;
+    margin-top: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 1rem 1rem 0 0;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    box-shadow: 0 -8px 24px rgb(0 0 0 / 0.18);
+    z-index: 50;
+    animation: overlay-sheet-slide-up 200ms ease-out;
   }
 }
 
-@layer components {
-  .card {
-    @apply bg-vx-card border border-vx-border rounded-xl overflow-hidden;
-    background-image: linear-gradient(160deg, color-mix(in srgb, var(--vx-sage) 2.5%, transparent) 0%, transparent 50%);
+@keyframes overlay-sheet-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
   }
-
-  /* The vx-* colours are CSS variables, so Tailwind can't apply an opacity
-     modifier to them (`bg-vx-surface/60` fails the build); translucent
-     variants below use color-mix() instead. */
-  .card-sm {
-    @apply border border-vx-border rounded-lg;
-    background-color: color-mix(in srgb, var(--vx-surface) 60%, transparent);
-  }
-
-  .eyebrow {
-    @apply text-[10px] font-semibold uppercase tracking-[0.18em] text-vx-muted;
-  }
-
-  .chip {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
-  }
-
-  .num {
-    font-family: var(--font-geist-mono);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .input-swap {
-    @apply w-full bg-transparent text-3xl font-light text-vx-text rounded-lg caret-vx-sage focus:outline-none focus:ring-2 focus:ring-vx-sage focus:ring-offset-2 focus:ring-offset-vx-card;
-  }
-
-  .input-swap::placeholder {
-    color: color-mix(in srgb, var(--vx-dim) 60%, transparent);
-  }
-
-  .token-btn {
-    @apply flex items-center gap-2 px-3 py-2 bg-vx-surface rounded-lg border border-vx-border hover:border-vx-border transition-all duration-150 cursor-pointer select-none;
-  }
-
-  .token-btn:hover {
-    background-color: color-mix(in srgb, var(--vx-card) 80%, transparent);
-  }
-
-  .chain-badge {
-    @apply inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-vx-lav-bg text-vx-lav border;
-    border-color: color-mix(in srgb, var(--vx-lav) 20%, transparent);
-  }
-
-  .stellar-badge {
-    @apply inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-vx-sage-bg text-vx-sage border;
-    border-color: color-mix(in srgb, var(--vx-sage) 20%, transparent);
-  }
-
-  .state-dot {
-    @apply w-1.5 h-1.5 rounded-full;
-  }
-}
-
-/* Swap button gradient */
-.btn-swap {
-  background: linear-gradient(135deg, var(--vx-sage) 0%, #38BDF8 100%);
-  color: var(--vx-ink);
-  font-weight: 700;
-  font-size: 0.9375rem;
-  padding: 0.875rem;
-  border-radius: 0.75rem;
-  width: 100%;
-  transition:
-    filter 0.15s,
-    transform 0.1s;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-swap:hover {
-  filter: brightness(1.08);
-}
-.btn-swap:active {
-  transform: scale(0.99);
-}
-.btn-swap:disabled {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--vx-sage) 25%, transparent) 0%, rgba(56,189,248,0.25) 100%);
-  color: color-mix(in srgb, var(--vx-ink) 50%, transparent);
-  cursor: not-allowed;
-}
-
-/* ── Light-mode .btn-swap text fix ───────────────────────────────────────── */
-/* On dark: ink is #080C14 (nearly black) — fine on the sage gradient.
-   On light: ink is #FFFFFF — also fine, gives white text on the green button. */
-
-/* Flow animation for intent pipeline */
-.intent-flow-line {
-  stroke-dasharray: 6 4;
-  stroke-dashoffset: 10;
-  animation: flow var(--vx-motion-duration) linear infinite;
-}
-
-@keyframes flow {
   to {
-    stroke-dashoffset: 0;
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-/* ── Reduced motion ──────────────────────────────────────────────────────── */
-/*
- * Motion is disabled when either the OS requests it (prefers-reduced-motion)
- * or the user picks "reduce" in SettingsPanel (html[data-motion="reduce"]).
- * Durations collapse to 0.01ms and infinite loops are stopped so no animation
- * keeps running (WCAG 2.2.2).  Essential progress indicators stay visible as
- * static marks rather than disappearing.
- */
+/* Respect reduced-motion preferences, consistent with the rest of the */
+/* app's motion handling.                                              */
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    --vx-motion-duration: 0.01ms;
-    --vx-motion-duration-fast: 0.01ms;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  .overlay-sheet {
+    animation: none !important;
+    transition: none !important;
   }
 }
 
-html[data-motion="reduce"] {
-  --vx-motion-duration: 0.01ms;
-  --vx-motion-duration-fast: 0.01ms;
-}
-
-html[data-motion="reduce"] *,
-html[data-motion="reduce"] *::before,
-html[data-motion="reduce"] *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-  scroll-behavior: auto !important;
-}
-
-/* ── Print: force the light palette ──────────────────────────────────────── */
-/*
- * Printing on a dark palette wastes ink and is often unreadable.  When the
- * user prints, force the light token values regardless of the active theme.
- */
-@media print {
-  :root,
-  html[data-theme="dark"],
-  html[data-theme="light"] {
-    color-scheme: light;
-
-    --vx-ink:     #FFFFFF;
-    --vx-base:    #FFFFFF;
-    --vx-surface: #FFFFFF;
-    --vx-card:    #FFFFFF;
-    --vx-border:  rgba(0, 0, 0, 0.15);
-    --vx-line:    rgba(0, 0, 0, 0.1);
-
-    --vx-sage:     #0A6849;
-    --vx-sage-dim: #0A6849;
-    --vx-sage-bg:  rgba(15, 168, 113, 0.08);
-
-    --vx-lav:     #4C1D95;
-    --vx-lav-dim: #4C1D95;
-    --vx-lav-bg:  rgba(124, 58, 237, 0.08);
-
-    --vx-amber: #92400E;
-    --vx-rose:  #991B1B;
-
-    --vx-text:  #000000;
-    --vx-muted: #374151;
-    --vx-dim:   #9CA3AF;
-
-    --vx-body-bg:      #FFFFFF;
-    --vx-body-radial1: transparent;
-    --vx-body-radial2: transparent;
-
-    --vx-scrollbar-thumb: rgba(0, 0, 0, 0.2);
-    --vx-selection-bg:    rgba(15, 168, 113, 0.2);
-    --vx-focus-ring:      rgba(15, 168, 113, 0.5);
-  }
-
-  body {
-    background-image: none;
-  }
-}
-
-/* ── Print (#447) ─────────────────────────────────────────────────────────
- * Printed receipts/records always use a light palette regardless of the
- * user's theme, and drop navigation and interactive chrome.
- */
-@media print {
-  @page {
-    margin: 16mm;
-  }
-
-  :root,
-  :root[data-theme] {
-    --vx-ink: #ffffff;
-    --vx-base: #ffffff;
-    --vx-surface: #f5f5f5;
-    --vx-card: #ffffff;
-    --vx-border: rgba(0, 0, 0, 0.2);
-    --vx-line: rgba(0, 0, 0, 0.1);
-    --vx-text: #111111;
-    --vx-muted: #444444;
-    --vx-dim: #666666;
-    --vx-sage: #1b6b49;
-    --vx-body-bg: #ffffff;
-  }
-
-  body {
-    background: #ffffff !important;
-    color: #111111 !important;
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
-  }
-
-  nav,
-  footer {
-    display: none !important;
-  }
-
-  .card {
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-  }
-
-  .receipt dd {
-    word-break: break-all;
-  }
-
-  .receipt dl > div {
-    break-inside: avoid;
-  }
-
-  /*
-   * Logical safe-area padding: in RTL the notch/inset sits on the opposite
-   * physical edge, so expose a logical-start variant that mirrors correctly.
-   */
-  .ps-safe {
-    padding-inline-start: env(safe-area-inset-left, 0px);
-  }
-
-  .pe-safe {
-    padding-inline-end: env(safe-area-inset-right, 0px);
-  }
+[data-motion="reduce"] .overlay-sheet {
+  animation: none !important;
+  transition: none !important;
 }

@@ -35,6 +35,11 @@ const chipClass = (active: boolean, tone: "default" | "warn" = "default") =>
  * Gear-button popover for slippage tolerance (presets + validated custom
  * value) and intent deadline. Values persist via `useSwapSettingsStore`;
  * only valid slippage values are ever committed to the store.
+ *
+ * On narrow viewports (`max-sm:`) the panel renders as a full-width bottom
+ * sheet anchored to the viewport edge; at `sm:` and above it keeps the
+ * anchored popover behaviour. Dismissal is delegated to
+ * `useDismissableOverlay` in both variants.
  */
 export function SwapSettings() {
   const { t } = useTranslation();
@@ -101,8 +106,9 @@ export function SwapSettings() {
           ref={panelRef}
           role="dialog"
           aria-label={t("swap.settings.title")}
-          className="absolute right-0 z-20 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-vx-border bg-vx-surface p-4 space-y-4 shadow-xl"
+          className="fixed inset-x-0 bottom-0 z-30 w-full max-h-[85vh] overflow-y-auto rounded-t-2xl border-t border-vx-border bg-vx-surface p-4 space-y-4 shadow-2xl motion-safe:animate-[vx-sheet-up_180ms_ease-out] sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-0 sm:top-full sm:z-20 sm:mt-2 sm:w-72 sm:max-w-[calc(100vw-2rem)] sm:max-h-none sm:overflow-visible sm:rounded-xl sm:border sm:shadow-xl sm:animate-none"
         >
+          <div aria-hidden="true" className="mx-auto mb-1 h-1 w-10 rounded-full bg-vx-border sm:hidden" />
           <fieldset className="space-y-2">
             <legend className="eyebrow mb-2">{t("swap.slippage.label")}</legend>
             <div className="flex flex-wrap gap-2">
@@ -195,7 +201,7 @@ export function SwapSettings() {
           <button
             type="button"
             onClick={handleReset}
-            className="text-xs text-vx-muted underline hover:text-vx-text focus:outline-none focus-visible:ring-2 focus-visible:ring-vx-sage/60 rounded"
+            className="text-xs text-vx-muted hover:text-vx-text underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-vx-sage/60 rounded"
           >
             {t("swap.settings.reset")}
           </button>
