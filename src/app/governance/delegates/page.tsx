@@ -145,7 +145,7 @@ export default function DelegatesPage() {
   };
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <main id="main-content" className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="text-2xl font-semibold">Voting delegation</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Delegate your voting power to a trusted address. Delegation is revocable at any time and
@@ -231,131 +231,6 @@ export default function DelegatesPage() {
             <li key={d.address} className="rounded-lg border p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="font-medium">{sanitizeText(d.name)}</p>
-                  <p className="font-mono text-xs break-all text-muted-foreground">{d.address}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelected(d);
-                    setManualAddress('');
-                    resetFlow();
-                  }}
-                  className="rounded-md border px-3 py-1.5 text-sm focus-visible:outline focus-visible:outline-2"
-                >
-                  Delegate
-                </button>
-              </div>
-              <p className="mt-2 text-sm">{sanitizeText(d.bio)}</p>
-              <dl className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
-                <div>
-                  <dt className="inline">Power: </dt>
-                  <dd className="inline">{formatPower(d.votingPower)}</dd>
-                </div>
-                <div>
-                  <dt className="inline">Participation: </dt>
-                  <dd className="inline">{formatPercent(d.participationRate)}</dd>
-                </div>
-                <div>
-                  <dt className="inline">Proposals voted: </dt>
-                  <dd className="inline">{d.proposalsVoted}</dd>
-                </div>
-              </dl>
-            </li>
-          ))}
-        </ul>
-      </section>
+                  <p className="
 
-      <section aria-labelledby="delegate-form" className="mt-8 rounded-lg border p-4">
-        <h2 id="delegate-form" className="text-lg font-medium">
-          Delegate to an address
-        </h2>
-        <label className="mt-3 block">
-          <span className="text-sm">Address</span>
-          <input
-            type="text"
-            value={selected ? selected.address : manualAddress}
-            onChange={(e) => {
-              setSelected(null);
-              setManualAddress(e.target.value);
-              resetFlow();
-            }}
-            className="mt-1 w-full rounded-md border px-3 py-2 font-mono text-sm"
-          />
-        </label>
-
-        {isNewAddress && targetAddress && (
-          <label className="mt-3 block">
-            <span className="text-sm">
-              Confirm the full address (address-poisoning defence)
-            </span>
-            <input
-              type="text"
-              value={confirmedAddress}
-              onChange={(e) => setConfirmedAddress(e.target.value)}
-              className="mt-1 w-full rounded-md border px-3 py-2 font-mono text-sm"
-            />
-          </label>
-        )}
-
-        {error && (
-          <p role="alert" className="mt-3 text-sm text-red-600">
-            {error}
-          </p>
-        )}
-
-        {stage === 'idle' && (
-          <button
-            type="button"
-            onClick={handleReview}
-            className="mt-4 rounded-md border px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2"
-          >
-            Review delegation
-          </button>
-        )}
-
-        {stage === 'review' && (
-          <div className="mt-4 rounded-md border p-3 text-sm">
-            <p>
-              You are delegating your voting power to{' '}
-              <span className="font-mono break-all">{targetAddress}</span>. Delegation is revocable
-              and applies to future proposals only.
-            </p>
-            <button
-              type="button"
-              onClick={handleSimulate}
-              className="mt-3 rounded-md border px-3 py-2 focus-visible:outline focus-visible:outline-2"
-            >
-              Simulate
-            </button>
-          </div>
-        )}
-
-        {stage === 'simulate' && (
-          <div className="mt-4 rounded-md border p-3 text-sm">
-            <p>Simulation succeeded. No state changes were made.</p>
-            <button
-              type="button"
-              onClick={handleSign}
-              className="mt-3 rounded-md border px-3 py-2 focus-visible:outline focus-visible:outline-2"
-            >
-              Sign &amp; delegate
-            </button>
-          </div>
-        )}
-
-        {(stage === 'sign' || stage === 'pending') && (
-          <p className="mt-4 text-sm" role="status">
-            Waiting for signature…
-          </p>
-        )}
-
-        {stage === 'done' && (
-          <p className="mt-4 text-sm" role="status">
-            Delegation updated. Effective voting power refreshed.
-          </p>
-        )}
-      </section>
-    </main>
-  );
-}
+/* … truncated 4405 chars — edit only what you need near the top … */
